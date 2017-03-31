@@ -1,18 +1,17 @@
 use std::io::{stdin,stdout,Write};
 
 fn main() {
-    let mut name = String::new();
-
     print!("What is your name? ");
-    let _= stdout().flush();
+    let _ = stdout().flush();
 
-    stdin().read_line(&mut name).expect("Did not enter a correct string");
-    if let Some('\n') = name.chars().next_back() {
-        name.pop();
-    }
-    if let Some('\r') = name.chars().next_back() {
-        name.pop();
-    }
+    let mut buffer = String::new();
+    let mut name: String = "World".to_string();
+
+    match stdin().read_line(&mut buffer) {
+        Ok(_) => name = if buffer.trim().len() > 0 { buffer.trim().to_string() } else { name },
+        Err(_) => panic!("Error reading input.")
+    };
 
     println!("Hello, {}, nice to meet you!", name);
 }
+
