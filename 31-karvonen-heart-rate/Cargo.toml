@@ -4,3 +4,4 @@ version = "0.1.0"
 authors = ["cjstehno <chris@stehno.com>"]
 
 [dependencies]
+console = "0.5.0"
