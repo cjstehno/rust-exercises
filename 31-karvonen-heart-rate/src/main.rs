@@ -1,7 +1,7 @@
 extern crate console;
 extern crate clap;
 
-use clap::{Arg, App, SubCommand};
+use clap::{Arg, App};
 use console::Term;
 use std::process::exit;
 
@@ -26,37 +26,9 @@ fn main() {
 
     let term = Term::stdout();
 
-    let mut age: u16 = 0;
+    let age: u16 = number_input(&term, matches.value_of("age"), "age");
 
-    if let Some(value) = matches.value_of("age") {
-        match value.parse::<u16>() {
-            Ok(num) => age = num,
-            Err(_) => {
-                term.write_line("A valid age must be provided.").unwrap();
-                exit(0);
-            }
-        }
-    } else {
-        term.write_str("How old are you? ").unwrap();
-
-        age = parse_number_input(&term, "age");
-    }
-
-    let mut resting_heart_rate: u16 = 0;
-
-    if let Some(value) = matches.value_of("resting") {
-        match value.parse::<u16>() {
-            Ok(num) => resting_heart_rate = num,
-            Err(_) => {
-                term.write_line("A valid resting heart rate must be provided.").unwrap();
-                exit(0);
-            }
-        }
-    } else {
-        term.write_str("What is your resting heart rate? ").unwrap();
-
-        resting_heart_rate = parse_number_input(&term, "resting heart rate");
-    }
+    let resting_heart_rate: u16 = number_input(&term, matches.value_of("resting"), "resting heart rate");
 
     term.write_line(&format!("\nResting Pulse: {}  Age: {}\n", resting_heart_rate, age)).unwrap();
 
@@ -72,18 +44,33 @@ fn main() {
     }
 }
 
-fn parse_number_input(term: &Term, label: &str) -> u16 {
-    if let Ok(line) = term.read_line() {
-        match line.parse::<u16>() {
-            Ok(num) => num,
-            Err(_) => {
+fn number_input(term: &Term, arg: Option<&str>, label: &str) -> u16 {
+    parse_input(term, resolve_input(term, arg, label), label)
+}
+
+fn resolve_input(term: &Term, arg: Option<&str>, label: &str) -> String {
+    match arg {
+        Some(value) => String::from(value),
+        None => {
+            term.write_str(&format!("What is your {}? ", label)).unwrap();
+
+            if let Ok(line) = term.read_line() {
+                line
+            } else {
                 term.write_line(&format!("A valid {} must be provided.", label)).unwrap();
                 exit(0);
             }
         }
-    } else {
-        term.write_line(&format!("A valid {} must be provided.", label)).unwrap();
-        exit(0);
+    }
+}
+
+fn parse_input(term: &Term, input: String, label: &str) -> u16 {
+    match input.parse::<u16>() {
+        Ok(num) => num,
+        Err(_) => {
+            term.write_line(&format!("A valid {} must be provided.", label)).unwrap();
+            exit(0);
+        }
     }
 }
 
