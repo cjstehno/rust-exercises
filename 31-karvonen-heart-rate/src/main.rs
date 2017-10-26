@@ -33,25 +33,34 @@ fn main() {
             .value_name("RATE")
             .help("Specifies the resting heart rate.")
             .takes_value(true))
+        .arg(Arg::with_name("intensity")
+            .short("i")
+            .long("intensity")
+            .value_name("N%")
+            .help("Selects the intensity percentage to report.")
+            .takes_value(true))
         .get_matches();
 
     let term = Term::stdout();
 
     let age: u16 = number_input(&term, matches.value_of("age"), "age");
-
     let resting_heart_rate: u16 = number_input(&term, matches.value_of("resting"), "resting heart rate");
 
-    term.write_line(&format!("\nResting Pulse: {}  Age: {}\n", resting_heart_rate, age)).unwrap();
+    if let Some(intensity) = optional_input(&term, matches.value_of("intensity"), "intensity"){
+        term.write_line(&format!("{} bpm", calculate_target_rate(age, resting_heart_rate, intensity))).unwrap();
 
-    term.write_line("Intensity | Target").unwrap();
-    term.write_line("-------------------").unwrap();
+    } else {
+        term.write_line(&format!("\nResting Pulse: {}  Age: {}\n", resting_heart_rate, age)).unwrap();
+        term.write_line("Intensity | Target").unwrap();
+        term.write_line("-------------------").unwrap();
 
-    let mut intensity: u16 = 50;
-    while intensity < 100 {
-        let target = calculate_target_rate(age, resting_heart_rate, intensity);
-        term.write_line(&format!("{}%       | {} bpm", intensity, target)).unwrap();
+        let mut intensity_pct: u16 = 50;
+        while intensity_pct < 100 {
+            let target = calculate_target_rate(age, resting_heart_rate, intensity_pct);
+            term.write_line(&format!("{}%       | {} bpm", intensity_pct, target)).unwrap();
 
-        intensity += 5;
+            intensity_pct += 5;
+        }
     }
 }
 
@@ -77,6 +86,21 @@ fn number_input(term: &Term, arg: Option<&str>, label: &str) -> u16 {
             term.write_line(&format!("A valid {} must be provided.", label)).unwrap();
             exit(0);
         }
+    }
+}
+
+fn optional_input(term: &Term, arg: Option<&str>, label: &str) -> Option<u16> {
+    match arg {
+        Some(value) => {
+            match value.parse::<u16>() {
+                Ok(num) => Some(num),
+                Err(_) => {
+                    term.write_line(&format!("A valid {} must be provided.", label)).unwrap();
+                    exit(0);
+                }
+            }
+        },
+        None => None
     }
 }
 
