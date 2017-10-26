@@ -1,7 +1,8 @@
 extern crate console;
+#[macro_use]
 extern crate clap;
 
-use clap::{Arg, App};
+use clap::{App};
 use console::Term;
 use std::process::exit;
 
@@ -9,6 +10,7 @@ use std::process::exit;
 /// Takes input of the age and resting heart rate and generates a table of target heart rates.
 ///
 /// Optional Command Line Arguments:
+/// * help (`-h`, `--help`)
 /// * age (`-a`, `--age`)
 /// * resting heart rate (`-r`, `--resting`)
 /// * intensity (`-i`, `--intensity`)
@@ -17,34 +19,13 @@ use std::process::exit;
 /// will be generated.
 ///
 fn main() {
-    let matches = App::new("karvonen-heart-rate")
-        .version("0.0.1")
-        .author("Christopher J. Stehno <chris@stehno.com>")
-        .about("Calculates your target heart rate given age and resting heart rate.")
-        .arg(Arg::with_name("age")
-            .short("a")
-            .long("age")
-            .value_name("AGE")
-            .help("Specifies the age.")
-            .takes_value(true))
-        .arg(Arg::with_name("resting")
-            .short("r")
-            .long("resting")
-            .value_name("RATE")
-            .help("Specifies the resting heart rate.")
-            .takes_value(true))
-        .arg(Arg::with_name("intensity")
-            .short("i")
-            .long("intensity")
-            .value_name("N%")
-            .help("Selects the intensity percentage to report.")
-            .takes_value(true))
-        .get_matches();
+    let yaml = load_yaml!("args.yml");
+    let matches = App::from_yaml(yaml).get_matches();
 
     let term = Term::stdout();
 
-    let age: u16 = number_input(&term, matches.value_of("age"), "age");
-    let resting_heart_rate: u16 = number_input(&term, matches.value_of("resting"), "resting heart rate");
+    let age: u16 = required_input(&term, matches.value_of("age"), "age");
+    let resting_heart_rate: u16 = required_input(&term, matches.value_of("resting"), "resting heart rate");
 
     if let Some(intensity) = optional_input(&term, matches.value_of("intensity"), "intensity"){
         term.write_line(&format!("{} bpm", calculate_target_rate(age, resting_heart_rate, intensity))).unwrap();
@@ -65,7 +46,7 @@ fn main() {
 }
 
 /// Parses the input from the command line or prompt and returns a number value.
-fn number_input(term: &Term, arg: Option<&str>, label: &str) -> u16 {
+fn required_input(term: &Term, arg: Option<&str>, label: &str) -> u16 {
     let input = match arg {
         Some(value) => String::from(value),
         None => {
@@ -89,6 +70,7 @@ fn number_input(term: &Term, arg: Option<&str>, label: &str) -> u16 {
     }
 }
 
+/// Parses the input from the command line for an optional argument.
 fn optional_input(term: &Term, arg: Option<&str>, label: &str) -> Option<u16> {
     match arg {
         Some(value) => {

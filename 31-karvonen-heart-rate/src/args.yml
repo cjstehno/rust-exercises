@@ -1,0 +1,23 @@
+name: karvonen-heart-rate
+version: "0.0.1"
+author: Christopher J. Stehno <chris@stehno.com>
+about: Calculates your target heart rate given age and resting heart rate.
+args:
+    - age:
+        short: a
+        long: age
+        value_name: YEARS
+        help: Specifies the age.
+        takes_value: true
+    - resting:
+        help: Specifies the resting heart rate (bpm).
+        short: r
+        long: resting
+        value_name: RATE
+        takes_value: true
+    - intensity:
+        short: i
+        long: intensity
+        value_name: PCT
+        takes_value: true
+        help: Sets the target percentage intensity.
