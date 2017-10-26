@@ -1,45 +1,47 @@
 extern crate console;
 
 use console::Term;
+use std::process::exit;
 
 // TODO: make version that takes cli args or presents with questions
-// TODO: error handling
 
 fn main() {
     let term = Term::stdout();
 
     term.write_str("How old are you? ").unwrap();
 
-    let mut age: u16 = 0;
-
-    if let Ok(line) = term.read_line() {
-        if let Ok(num) = line.parse::<u16>() {
-            age = num;
-        } else {
-            panic!("The specified age is invalid!");
-        }
-    }
+    let age: u16 = parse_number_input(&term, "age");
 
     term.write_str("What is your resting heart rate? ").unwrap();
 
-    let mut resting_heart_rate: u16 = 0;
-
-    if let Ok(line) = term.read_line() {
-        if let Ok(num) = line.parse::<u16>() {
-            resting_heart_rate = num;
-        } else {
-            panic!("The specified heart rate is invalid!");
-        }
-    }
+    let resting_heart_rate: u16 = parse_number_input(&term, "resting heart rate");
 
     term.write_line(&format!("\nResting Pulse: {}  Age: {}\n", resting_heart_rate, age)).unwrap();
 
     term.write_line("Intensity | Target").unwrap();
     term.write_line("-------------------").unwrap();
 
-    for intensity in 55..96 {
+    let mut intensity: u16 = 50;
+    while intensity < 100 {
         let target = calculate_target_rate(age, resting_heart_rate, intensity);
         term.write_line(&format!("{}%       | {} bpm", intensity, target)).unwrap();
+
+        intensity += 5;
+    }
+}
+
+fn parse_number_input(term: &Term, label: &str) -> u16 {
+    if let Ok(line) = term.read_line() {
+        match line.parse::<u16>() {
+            Ok(num) => num,
+            Err(_) => {
+                term.write_line(&format!("A valid {} must be provided.", label)).unwrap();
+                exit(0);
+            }
+        }
+    } else {
+        term.write_line(&format!("A valid {} must be provided.", label)).unwrap();
+        exit(0);
     }
 }
 
