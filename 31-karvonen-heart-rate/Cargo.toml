@@ -1,0 +1,6 @@
+[package]
+name = "karvonen-heart-rate"
+version = "0.1.0"
+authors = ["cjstehno <chris@stehno.com>"]
+
+[dependencies]
