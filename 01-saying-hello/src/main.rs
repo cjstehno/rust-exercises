@@ -1,17 +1,17 @@
-use std::io::{stdin,stdout,Write};
+extern crate console;
+
+use console::Term;
+
+const WRITE_ERROR: &'static str = "Unable to write to terminal!";
 
 fn main() {
-    print!("What is your name? ");
-    let _ = stdout().flush();
+    let term = Term::stdout();
 
-    let mut buffer = String::new();
-    let mut name: String = "World".to_string();
+    term.write_str("What is your name? ").expect(WRITE_ERROR);
 
-    match stdin().read_line(&mut buffer) {
-        Ok(_) => name = if buffer.trim().len() > 0 { buffer.trim().to_string() } else { name },
-        Err(_) => panic!("Error reading input.")
-    };
-
-    println!("Hello, {}, nice to meet you!", name);
+    if let Ok(line) = term.read_line() {
+        let name: String = if line.len() > 0 { line } else { String::from("World") };
+        term.write_line(&format!("Hello, {}, nice to meet you!", name)).expect(WRITE_ERROR);
+    }
 }
 
