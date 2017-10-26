@@ -4,5 +4,5 @@ version = "0.1.0"
 authors = ["cjstehno <chris@stehno.com>"]
 
 [dependencies]
-clap = "2.27.0"
+clap = "2.27.1"
 console = "0.5.0"
