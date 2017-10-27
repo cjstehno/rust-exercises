@@ -1,0 +1,17 @@
+name: grabbing-the-weather
+version: "0.1.0"
+author: Christopher J. Stehno <chris@stehno.com>
+about: Generates a report of the current weather conditions for a specified location.
+args:
+    - zip:
+        short: z
+        long: zip
+        value_name: ZIP
+        help: Specifies the zip code.
+        takes_value: true
+    - key:
+        short: k
+        long: api-key
+        value_name: KEY
+        help: Specifies the API key.
+        takes_value: true
