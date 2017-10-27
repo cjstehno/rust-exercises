@@ -20,9 +20,7 @@ fn main() {
     let zip_code = required_input(&term, matches.value_of("zip"), "ZIP code");
     let api_key = required_input(&term, matches.value_of("key"), "API key");
 
-    let mut resp = reqwest::get(&format!("{}?zip={}&APPID={}", BASE_URL, zip_code, api_key)).unwrap();
-
-    if resp.status().is_success(){
+    if let Ok(mut resp) = reqwest::get(&format!("{}?zip={}&APPID={}", BASE_URL, zip_code, api_key)) {
         let json: Value = resp.json().unwrap();
 
         println!(
@@ -34,7 +32,6 @@ fn main() {
             temp_k_to_f(json["main"]["temp_max"].as_f64().unwrap()),
             json["wind"]["speed"].as_f64().unwrap()
         );
-
     } else {
         println!("🌡️ Unable to contact weather server.")
     }
