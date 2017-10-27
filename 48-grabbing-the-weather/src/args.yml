@@ -1,7 +1,7 @@
 name: grabbing-the-weather
 version: "0.1.0"
 author: Christopher J. Stehno <chris@stehno.com>
-about: Generates a report of the current weather conditions for a specified location.
+about: Generates a report of the current weather conditions for a specified location (requires openweathermap.org account API key).
 args:
     - zip:
         short: z

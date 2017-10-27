@@ -22,20 +22,22 @@ fn main() {
 
     let mut resp = reqwest::get(&format!("{}?zip={}&APPID={}", BASE_URL, zip_code, api_key)).unwrap();
 
-    // TODO: check this
-    assert!(resp.status().is_success());
+    if resp.status().is_success(){
+        let json: Value = resp.json().unwrap();
 
-    let json: Value = resp.json().unwrap();
+        println!(
+            "{}\"{}\" {:2.0}℉ (high: {:2.0}℉, low: {:2.0}℉) {:3.1} mph winds.",
+            select_icon(json["weather"][0]["icon"].as_str().unwrap()),
+            json["weather"][0]["description"].as_str().unwrap(),
+            temp_k_to_f(json["main"]["temp"].as_f64().unwrap()),
+            temp_k_to_f(json["main"]["temp_min"].as_f64().unwrap()),
+            temp_k_to_f(json["main"]["temp_max"].as_f64().unwrap()),
+            json["wind"]["speed"].as_f64().unwrap()
+        );
 
-    println!(
-        "{}\"{}\" {:2.0}℉ (high: {:2.0}℉, low: {:2.0}℉) {:3.1} mph winds.",
-        select_icon(json["weather"][0]["icon"].as_str().unwrap()),
-        json["weather"][0]["description"].as_str().unwrap(),
-        temp_k_to_f(json["main"]["temp"].as_f64().unwrap()),
-        temp_k_to_f(json["main"]["temp_min"].as_f64().unwrap()),
-        temp_k_to_f(json["main"]["temp_max"].as_f64().unwrap()),
-        json["wind"]["speed"].as_f64().unwrap()
-    );
+    } else {
+        println!("🌡️ Unable to contact weather server.")
+    }
 }
 
 fn select_icon(icon_id: &str) -> &str {
@@ -74,49 +76,3 @@ fn required_input(term: &Term, arg: Option<&str>, label: &str) -> String {
 fn temp_k_to_f(kelvin: f64) -> f64 {
     kelvin * 9.0 / 5.0 - 459.67
 }
-
-/*
-{
-    "coord": {
-        "lon": -96.7,
-        "lat": 33.02
-    },
-    "weather": [
-        {
-            "id": 800,
-            "main": "Clear",
-            "description": "clear sky",
-            "icon": "01d"
-        }
-    ],
-    "base": "stations",
-    "main": {
-        "temp": 282.86,
-        "pressure": 1017,
-        "humidity": 57,
-        "temp_min": 281.15,
-        "temp_max": 284.15
-    },
-    "visibility": 16093,
-    "wind": {
-        "speed": 8.2,
-        "deg": 350,
-        "gust": 13.9
-    },
-    "clouds": {
-        "all": 1
-    },
-    "dt": 1509108900,
-    "sys": {
-        "type": 1,
-        "id": 2678,
-        "message": 0.17,
-        "country": "US",
-        "sunrise": 1509108080,
-        "sunset": 1509147560
-    },
-    "id": 4719457,
-    "name": "Plano",
-    "cod": 200
-}
-*/
