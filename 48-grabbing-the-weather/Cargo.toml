@@ -1,0 +1,6 @@
+[package]
+name = "grabbing-the-weather"
+version = "0.1.0"
+authors = ["cjstehno <chris@stehno.com>"]
+
+[dependencies]
